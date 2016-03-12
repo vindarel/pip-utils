@@ -1,0 +1,16 @@
+* pip-utils
+
+state: functional, but needs more work and re-writing.
+
+- install packages from the requirements file,
+- install a package and add it to the requirements file,
+- get the package version
+- visit the package on pypi
+- get its doc on another buffer
+- change virtual env (with virtualenvwrapper)
+
+
+** See also
+
+- pip-requirements
+- pcmpl-pip
