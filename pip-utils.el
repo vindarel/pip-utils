@@ -1,5 +1,11 @@
+;;; pip-utils.el: utility functions to run pip in current project
+;;; https://gitlab.com/emacs-stuff/pip-utils
+;;; author: vindarel
+;;; licence: wtf public licence
+
 (require 'virtualenvwrapper)
 (require 'f)
+(require 'hydra)
 (require 's)
 
 (defun pip-get-package-version (package)
@@ -14,7 +20,9 @@ bit of processing."
 
 (defun pip-install (package &optional add-to-requirements)
   "install package with pip in the right virtual env.
-   Use venv-workon to change it."
+   Use venv-workon to change it.
+   Add the package to the requirements.txt file (works for Django projects).
+  "
   ;; TODO: (ido) completing read with the current venv as default
   ;; and an option for a global install.
   ;; TODO: word at point as suggestion. see npm.
@@ -23,6 +31,7 @@ bit of processing."
                                                    venv-current-name))))
   (message "installing %s in venv %s" package venv-current-name)
   (compile (concat "pip install " package))
+  ;; if compile fails, nothing's added.
   (if add-to-requirements
       (progn
         (append-to-file (format "\n%s" package) nil (pip--get-requirements-file))) ;to finish
@@ -72,6 +81,8 @@ bit of processing."
 )
 
 (defun pip--get-requirements-file ()
+  "Works for Django projects.
+  "
   (concat (projectile-project-root) (projectile-project-name) "/requirements.txt")
 )
 
@@ -135,24 +146,13 @@ bit of processing."
 )
 )
 
-;; discover pip commands with a magit-like menu
-;; with Mickey's discover.el
-;; https://github.com/mickeynp/discover.el
+(defhydra pip-utils-hydra (:color blue :columns 4)
+  "
+Pip utils. venv: %`venv-current-name "
+  ("i" (pip-install) "Install a package in current venv")
+  ("I" (call-interactively 'pip-install-add-to-requirements) "Install and add in requirements.txt")
+  ("r" (pip-install-requirements) "-r requirements")
+  ("w" (venv-workon) "Workon venv…" :color red)
+  )
 
-;; We have a global shortcul (s-p) that shows a list of actions with a key each.
-
-(require 'discover)
-
-(discover-add-context-menu
- :context-menu '(pip
-              (description "pip utilities")
-              (actions
-               ("pip"
-                ("i" "install a package" pip-install)
-                ("a" "install a package and add to requirements file" pip-install-add-to-requirements)
-                ("r" "install requirements" pip-requirements)
-                ("h" "go to homepage of package at point" pip-homepage))
-               ))
- :bind "s-p")
-
-(add-hook 'prog-mode-hook 'discover--turn-on-pip)
+;;; pip-utils.el ends here
