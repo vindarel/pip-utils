@@ -2,15 +2,17 @@
 
 state: functional, but needs more work and re-writing.
 
+One command to know: =M-x pip-utils-hydra/body=.
+
 - install packages from the requirements file,
-- install a package and add it to the requirements file,
-- get the package version
-- visit the package on pypi
-- get its doc on another buffer
-- change virtual env (with virtualenvwrapper)
+- ask for a package, install it and optionally add it to the requirements file,
+- get the package version,
+- open the package's page on pypi,
+- get its doc on another buffer (wip),
+- change virtual env (with virtualenvwrapper, on melpa)
 
 
 ** See also
 
-- pip-requirements
-- pcmpl-pip
+- pip-requirements for syntax highlighting of requirements files,
+- pcmpl-pip for shell completion
