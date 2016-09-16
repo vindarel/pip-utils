@@ -124,15 +124,16 @@ bit of processing."
   (format "https://pypi.python.org/pypi/%s" package)
 )
 
-(defun pip-homepage ()
-  "Open the pypi homepage of the package at point."
+(defun pip-homepage (&optional package)
+  "Open the pypi homepage of the given package, or the one at point."
   (interactive)
-  (let ((package (thing-at-point 'filename)))
-    (browse-url-xdg-open (pip--pypi-url package))
-    )
-)
+  (let* ((package (or package (read-from-minibuffer (format "Package? [%s]"
+                                                           (thing-at-point 'word)))))
+         (package (or package (thing-at-point 'word))))
+    (browse-url-xdg-open (pip--pypi-url package))))
 
 (defun pip-doc-popup ()
+  ;TODO:
   "Display the presentation of the package (from pypi) at point in a pop-up."
   (interactive)
   ;; goal: get the html source, insert in temp buffer, parse the html of this buffer.
