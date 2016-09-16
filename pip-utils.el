@@ -8,15 +8,18 @@
 (require 'hydra)
 (require 's)
 
-(defun pip-get-package-version (package)
+(defun pip-utils-package-version (&optional package)
   "get the package version number with 'pip show package' and a
 bit of processing."
-  ;; would be more robust if pip add a --json flag, like npm.
-  (setq pip-output (s-split "\n" (shell-command-to-string (format "pip show %s" package))))
-  ;; for --map, see its doc: https://github.com/magnars/dash.el "it" is the list item.
-  (setq pip-output-list (--map (s-split ":" it) pip-output))  ;; implicit lambda. Closer to haskell !
-  (s-trim (nth 1 (nth 2 pip-output-list)))
-)
+  (let* ((package (or package
+                     (read-from-minibuffer "Package? ")))
+         ;; would be more robust if pip add a --json flag, like npm.
+         (pip-output (s-split "\n" (shell-command-to-string (format "pip show %s" package))))
+         ;; for --map, see its doc: https://github.com/magnars/dash.el "it" is the list item.
+         (pip-output-list (--map (s-split ":" it) pip-output))
+         (version (s-trim (nth 1 (nth 2 pip-output-list)))))
+    (message (format "%s v%s" package version))
+    version))
 
 (defun pip-install (package &optional add-to-requirements)
   "install package with pip in the right virtual env.
@@ -152,6 +155,7 @@ Pip utils. venv: %`venv-current-name "
   ("i" (pip-install) "Install a package in current venv")
   ("I" (call-interactively 'pip-install-add-to-requirements) "Install and add in requirements.txt")
   ("r" (pip-install-requirements) "-r requirements")
+  ("v" (pip-utils-package-version) "Get package version")
   ("w" (venv-workon) "Workon venv…" :color red)
   )
 
