@@ -3,10 +3,14 @@
 ;;; author: vindarel
 ;;; licence: wtf public licence
 
-(require 'virtualenvwrapper)
+(require 'ido)
 (require 'f)
 (require 'hydra)
 (require 's)
+(require 'virtualenvwrapper)
+
+(defvar pip-requirements-glob "*requirements*.txt"
+  "Glob pattern of the requirements file to look for at the project root, at root/<project-name>/ and inside a 'requirements' directory") ;; unused yet
 
 (defun pip-utils-package-version (&optional package)
   "get the package version number with 'pip show package' and a
@@ -30,28 +34,27 @@ bit of processing."
   ;; and an option for a global install.
   ;; TODO: word at point as suggestion. see npm.
   ;; TODO: set the version.
-  (let ((package (read-from-minibuffer (format "Package? (in venv %s) "
-                                               venv-current-name))))
+  (let* ((package (read-from-minibuffer (format "Package? (in venv %s) "
+                                               venv-current-name)))
+         (candidates (pip--get-requirements-file))
+         (reqfile (ido-completing-read "Requirements file ? " candidates)))
     (message "installing %s in venv %s" package venv-current-name)
     (compile (concat "pip install " package))
     ;; if compile fails, nothing should be added.
     (if add-to-requirements
         (progn
-          (append-to-file (format "\n%s" package) nil (pip--get-requirements-file))) ;to finish
-      )))
+          (if reqfile
+              (append-to-file (format "\n%s" package) nil reqfile))
+      ))))
 
-(defun pip-install-add-to-requirements (package)
+(defun pip-install-add-to-requirements (&optional package)
   "Install the package and add it to the project's requirements file."
-  (interactive (list (read-from-minibuffer (format "Package ? (in venv %s) " venv-current-name))))
+  (interactive) ;;(list (read-from-minibuffer (format "Package ? (in venv %s) " venv-current-name))))
   (call-interactively (pip-install package t)) ; to finish
   )
 
-(defvar pip-requirements-file "requirements.txt"
-  "name of the requirements file to look for at the project root and at root/<project-name>/")
-
 (defun pip-get-packages-list (req-file)
   "parses the requirements file and returns a list of packages to be installed, with their version.
-
    Must have one package per line."
   (setq pip-packages-list (with-temp-buffer
     (progn
@@ -65,10 +68,9 @@ bit of processing."
   (setq pip-packages-list (s-lines pip-packages-list))
   (setq pip-packages-list (mapcar (lambda (x) (s-trim x)) pip-packages-list))
   ;; caution: the string Django>=1.6 would mean something to the shell.
-  (setq pip-packages-list (mapcar (lambda (x)
-                                    (unless (string-equal x "")
-                                      (s-wrap x "\""))) pip-packages-list))
-)
+  (setq pip-packages-list (mapcar (lambda (it)
+                                    (unless (string-equal it "")
+                                      (s-wrap it "\""))) pip-packages-list)))
 
 (defun pip--install-requirements (pip--requirements-project)
   "Ask to install the packages in the given file and run it in a compilation process."
@@ -78,15 +80,24 @@ bit of processing."
         (setq pip-packages-list (pip-get-packages-list pip--requirements-project))
         ;; install everything:
         (compile (concat "pip install " (s-join " " pip-packages-list)))
-        )
-    )
-)
+        )))
 
 (defun pip--get-requirements-file ()
   "Works for Django projects.
   "
-  (concat (projectile-project-root) (projectile-project-name) "/requirements.txt")
-)
+  (let* ((root (projectile-project-root))
+         (req-candidates (f-glob ".*requirements.*txt" root))
+         (inproject (f-glob "*requirements*txt" (concat root (projectile-project-name))))
+         (req-dir (f-directories root (lambda (dir) (equal (f-filename dir) "requirements"))))
+         (req-dir-files (if req-dir
+                            (--map (f-files it) req-dir)))
+         (candidates (-concat req-candidates inproject (car req-dir-files))))
+    (or candidates
+        (message "We didn't find any requirements file"))
+    candidates))
+
+  ;; (concat (projectile-project-root) (projectile-project-name) "/requirements.txt")
+
 
 (defun pip-install-requirements ()
   "Install packages from requirements.txt. Looks for a
