@@ -21,7 +21,7 @@ bit of processing."
     (message (format "%s v%s" package version))
     version))
 
-(defun pip-install (package &optional add-to-requirements)
+(defun pip-install (&optional package add-to-requirements)
   "install package with pip in the right virtual env.
    Use venv-workon to change it.
    Add the package to the requirements.txt file (works for Django projects).
@@ -30,20 +30,19 @@ bit of processing."
   ;; and an option for a global install.
   ;; TODO: word at point as suggestion. see npm.
   ;; TODO: set the version.
-  (interactive (list (read-from-minibuffer (format "Package? (in venv %s) "
-                                                   venv-current-name))))
-  (message "installing %s in venv %s" package venv-current-name)
-  (compile (concat "pip install " package))
-  ;; if compile fails, nothing's added.
-  (if add-to-requirements
-      (progn
-        (append-to-file (format "\n%s" package) nil (pip--get-requirements-file))) ;to finish
-    )
-  )
+  (let ((package (read-from-minibuffer (format "Package? (in venv %s) "
+                                               venv-current-name))))
+    (message "installing %s in venv %s" package venv-current-name)
+    (compile (concat "pip install " package))
+    ;; if compile fails, nothing should be added.
+    (if add-to-requirements
+        (progn
+          (append-to-file (format "\n%s" package) nil (pip--get-requirements-file))) ;to finish
+      )))
 
 (defun pip-install-add-to-requirements (package)
   "Install the package and add it to the project's requirements file."
-  (interactive "sPackage ? ")
+  (interactive (list (read-from-minibuffer (format "Package ? (in venv %s) " venv-current-name))))
   (call-interactively (pip-install package t)) ; to finish
   )
 
