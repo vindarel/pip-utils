@@ -37,6 +37,7 @@ bit of processing."
   (let* ((package (read-from-minibuffer (format "Package? (in venv %s) "
                                                venv-current-name)))
          (candidates (pip--get-requirements-file))
+         (ido-separator "\n")
          (reqfile (ido-completing-read "Requirements file ? " candidates)))
     (message "installing %s in venv %s" package venv-current-name)
     (compile (concat "pip install " package))
