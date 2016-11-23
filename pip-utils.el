@@ -115,20 +115,6 @@ bit of processing."
         (message "no requirements at root"))
     ))
 
-;; pip install in venv
-  ;; venv-workon foo  ;; see venv-current-name may be nil
-  ;; (compile pip install truc
-  ;; and add in requirements and installed apps (asking)
-(defun pip-workon (env)
-  "Prompt with a default option."
-  ;; use ido-completing-read to suggest venvs (or just use venv function)
-  ;; exple: http://www.lunaryorn.com/2014/07/18/ansible-docs-in-emacs.html
-  (interactive (list (read-from-minibuffer (concat "Workon ["
-                                                   (s-join " " (venv-get-candidates))
-                                                   "]: "))
-                     ))
-  (message env)
-  )
 
 (defun pip--pypi-url (package)
   "Takes a package and returns its pypi url."
