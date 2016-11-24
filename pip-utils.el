@@ -38,7 +38,8 @@ bit of processing."
                                                venv-current-name)))
          (candidates (pip--get-requirements-file))
          (ido-separator "\n")
-         (reqfile (ido-completing-read "Requirements file ? " candidates)))
+         (reqfile (if add-to-requirements
+                      (ido-completing-read "Requirements file ? " candidates))))
     (message "installing %s in venv %s" package venv-current-name)
     (compile (concat "pip install " package))
     ;; if compile fails, nothing should be added.
