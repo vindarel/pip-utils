@@ -116,6 +116,20 @@ bit of processing."
         (message "no requirements at root"))
     ))
 
+(defun pip--get-all-packages ()
+  "Get all packages of the current venv (with pip freeze)."
+  (let* ((txt (shell-command-to-string "pip freeze"))
+         (packages (s-split "\n" txt))
+         (packages (--remove (s-starts-with-p "You " it) packages))
+         (packages (--map (car (s-split "==" it)) packages))
+    packages)))
+
+(defun pip-uninstall ()
+  "Uninstall a packages (ido completion on package list of current venv)."
+  (interactive)
+  (let* ((packages (pip--get-all-packages))
+        (package (ido-completing-read "Package ? " packages)))
+    (compile (concat "pip uninstall --yes" package))))
 
 (defun pip--pypi-url (package)
   "Takes a package and returns its pypi url."
@@ -154,6 +168,7 @@ Pip utils. venv: %`venv-current-name "
   ("i" (pip-install) "Install a package in current venv")
   ("I" (call-interactively 'pip-install-add-to-requirements) "Install and add in requirements.txt")
   ("r" (pip-install-requirements) "-r requirements")
+  ("u" (pip-uninstall) "uninstall")
   ("v" (pip-utils-package-version) "Get package version")
   ("w" (venv-workon) "Workon venv…" :color red)
   )
