@@ -1,15 +1,24 @@
 * pip-utils
 
-state: functional, but needs more work and re-writing.
+Helper  commands  to  quickly  (un)install a  pip  package,  with  ido
+completion, with the option to save  it in a requirements file (choose
+the file if many are found).
 
 One command to know: =M-x pip-utils-hydra/body=.
 
-- install packages from the requirements file,
-- ask for a package, install it and optionally add it to the requirements file,
-- get the package version,
-- open the package's page on pypi,
-- get its doc on another buffer (wip),
-- change virtual env (with virtualenvwrapper, on melpa)
+Quick    access   to    change    the    current   virtualenv    (with
+=virtualenvwrapper.el=, on melpa).
+
+Commands:
+
+- =M-x pip-utils-install=: ask for a package, install it and optionally add it to a requirements file,
+- =M-x  pip-utils-install-add-to-requirements-=: install  the packages
+  from    a   requirements    file   (auto    discovered,   if    many
+  =requirements.*.txt= files found, we ask),
+- =M-x pip-utils-package-version=: get a package version,
+- =M-x pip-utils-homepage=: open the package's page on pypi,
+- =M-x pip-utils-doc-popup=: get its doc on another buffer (wip),
+- =M-x venv-workon=: change the current virtual env (with virtualenvwrapper, on melpa)
 
 
 ** See also
