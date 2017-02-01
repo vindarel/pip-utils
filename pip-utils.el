@@ -136,12 +136,17 @@ bit of processing."
   (format "https://pypi.python.org/pypi/%s" package)
 )
 
+(defun pip--clean-symbol (str)
+  (if (s-contains-p "==" str)
+      (car (s-split "==" str))
+    str))
+
 (defun pip-homepage (&optional package)
   "Open the pypi homepage of the given package, or the one at point."
   (interactive)
   (let* ((package (or package (read-from-minibuffer (format "Package? [%s]"
-                                                           (thing-at-point 'word)))))
-         (package (or package (thing-at-point 'word))))
+                                                            (pip--clean-symbol (thing-at-point 'symbol))))))
+         (package (and (s-blank? package) (pip--clean-symbol (thing-at-point 'symbol)))))
     (browse-url-xdg-open (pip--pypi-url package))))
 
 (defun pip-doc-popup ()
@@ -170,6 +175,7 @@ Pip utils. venv: %`venv-current-name "
   ("r" (pip-install-requirements) "-r requirements")
   ("u" (pip-uninstall) "uninstall")
   ("v" (pip-utils-package-version) "Get package version")
+  ("h" (pip-homepage) "Open the homepage in the browser")
   ("w" (venv-workon) "Workon venv…" :color red)
   )
 
