@@ -14,7 +14,9 @@ Commands:
 - =M-x pip-utils-install=: ask for a package, install it and optionally add it to a requirements file,
 - =M-x  pip-utils-install-add-to-requirements-=: install  the packages
   from    a   requirements    file   (auto    discovered,   if    many
-  =requirements.*.txt= files found, we ask),
+  =requirements.*= files found,  we ask. We look at  the project root,
+  at  the   project  app   (suitable  for   Django  projects),   in  a
+  "requirements/" directory.),
 - =M-x pip-utils-package-version=: get a package version,
 - =M-x pip-utils-homepage=: open the package's page on pypi,
 - =M-x pip-utils-doc-popup=: get its doc on another buffer (wip),

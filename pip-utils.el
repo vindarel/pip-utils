@@ -85,18 +85,23 @@ bit of processing."
         )))
 
 (defun pip--get-requirements-file ()
-  "Works for Django projects.
-  "
+  "Return a list of requirements files, or error out.
+
+We look for files matching 'requirements', with any extension (so that we match .in and .txt files).
+We look into:
+- the project root
+- for Django projects for instance, into the project_root/app_name directory,
+- any directory called 'requirements'."
   (let* ((root (projectile-project-root))
-         (req-candidates (f-glob ".*requirements.*txt" root))
-         (inproject (f-glob "*requirements*txt" (concat root (projectile-project-name))))
+         (req-candidates (f-glob "*requirements*" root))
+         (inproject (f-glob "*requirements*" (concat root (projectile-project-name))))
          (req-dir (f-directories root (lambda (dir) (equal (f-filename dir) "requirements"))))
          (req-dir-files (if req-dir
                             (--map (f-files it) req-dir)))
          (candidates (-concat req-candidates inproject (car req-dir-files))))
     (or candidates
-        (message "We didn't find any requirements file"))
-    candidates))
+        (error "We didn't find any requirements file.")
+        candidates)))
 
   ;; (concat (projectile-project-root) (projectile-project-name) "/requirements.txt")
 
