@@ -18,7 +18,9 @@ bit of processing."
   (let* ((package (or package
                      (read-from-minibuffer "Package? ")))
          ;; would be more robust if pip add a --json flag, like npm.
-         (pip-output (s-split "\n" (shell-command-to-string (format "pip show %s" package))))
+         (pip-output (if (s-blank? package)
+                       (error "no package selected")
+                       (s-split "\n" (shell-command-to-string (format "pip show %s" package)))))
          ;; for --map, see its doc: https://github.com/magnars/dash.el "it" is the list item.
          (pip-output-list (--map (s-split ":" it) pip-output))
          (version (s-trim (nth 1 (nth 2 pip-output-list)))))
