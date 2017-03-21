@@ -12,19 +12,20 @@
 (defvar pip-requirements-glob "*requirements*.txt"
   "Glob pattern of the requirements file to look for at the project root, at root/<project-name>/ and inside a 'requirements' directory") ;; unused yet
 
-(defun pip-utils-package-version (&optional package)
-  "get the package version number with 'pip show package' and a
-bit of processing."
-  (let* ((package (or package
-                     (read-from-minibuffer "Package? ")))
-         ;; would be more robust if pip add a --json flag, like npm.
-         (pip-output (if (s-blank? package)
-                       (error "no package selected")
-                       (s-split "\n" (shell-command-to-string (format "pip show %s" package)))))
-         ;; for --map, see its doc: https://github.com/magnars/dash.el "it" is the list item.
-         (pip-output-list (--map (s-split ":" it) pip-output))
-         (version (s-trim (nth 1 (nth 2 pip-output-list)))))
-    (message (format "%s v%s" package version))
+(defun pip-utils-package-version ()
+  "Get the package version number with a pip freeze. Local packages autocompletion. Display the package name and its version, return the version number. For a script use, see --get-package-version (package)"
+  ;; with pip freeze, we have the package version inline.
+  (let* ((packages (pip--get-all-packages))
+         (package (ido-completing-read "Package? " packages)))
+    (if (s-blank? package)
+        (error "no package selected"))
+    (message package)))
+
+(defun pip-utils--get-package-version (package)
+  "Return the given package version (str). Uses pip freeze."
+  (let* ((packages (pip--get-all-packages))
+         (package (car (--filter (s-starts-with-p package it) packages)))
+         (version (cadr (s-split "==" package))))
     version))
 
 (defun pip-install (&optional package add-to-requirements)
@@ -124,12 +125,13 @@ We look into:
     ))
 
 (defun pip--get-all-packages ()
-  "Get all packages of the current venv (with pip freeze)."
+  "Get all packages of the current venv (with pip freeze). Keep their inline version. Return a list of package==x.y.z"
   (let* ((txt (shell-command-to-string "pip freeze"))
          (packages (s-split "\n" txt))
          (packages (--remove (s-starts-with-p "You " it) packages))
-         (packages (--map (car (s-split "==" it)) packages))
-    packages)))
+         ;; (packages (--map (car (s-split "==" it)) packages))
+         )
+    packages))
 
 (defun pip-uninstall ()
   "Uninstall a packages (ido completion on package list of current venv)."
