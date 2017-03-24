@@ -18,7 +18,8 @@ Commands:
   at  the   project  app   (suitable  for   Django  projects),   in  a
   "requirements/" directory.),
 - =M-x pip-utils-package-version=: get a package version,
-- =M-x pip-utils-homepage=: open the package's page on pypi,
+- =M-x pip-utils-homepage=:  open the package's  page on pypi,  from a
+  given package, orthe symbol at point, or one to choose from a pip freeze;
 - =M-x pip-utils-doc-popup=: get its doc on another buffer (wip),
 - =M-x venv-workon=: change the current virtual env (with virtualenvwrapper, on melpa)
 

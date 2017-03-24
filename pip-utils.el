@@ -146,16 +146,24 @@ We look into:
 )
 
 (defun pip--clean-symbol (str)
+  ;; XXX also < etc
   (if (s-contains-p "==" str)
       (car (s-split "==" str))
     str))
 
 (defun pip-homepage (&optional package)
-  "Open the pypi homepage of the given package, or the one at point."
+  "Open the pypi homepage of the given package, or the one at point, or one we choose from a pip freeze."
   (interactive)
-  (let* ((package (or package (read-from-minibuffer (format "Package? [%s]"
-                                                            (pip--clean-symbol (thing-at-point 'symbol))))))
-         (package (and (s-blank? package) (pip--clean-symbol (thing-at-point 'symbol)))))
+  (let* ((package (or package (thing-at-point 'symbol)))
+         ;; Prompt with thing at point as default.
+         (package (and package (if (s-blank? (read-from-minibuffer
+                                              (format "Package? [%s]"
+                                                      (pip--clean-symbol package))))
+                                   package))) ;; selecting the default choice between brackets returns ""
+         ;; otherwise, completion with all packages.
+         (package (or package (ido-completing-read "Package ?" (pip--get-all-packages))))
+         ;; remove "=="
+         (package (and package (pip--clean-symbol package))))
     (browse-url-xdg-open (pip--pypi-url package))))
 
 (defun pip-doc-popup ()
