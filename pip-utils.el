@@ -88,12 +88,12 @@
         )))
 
 (defun pip--get-requirements-file ()
-  "Return a list of requirements files, or error out.
+  "Return a list of requirements files, or error out if no one is found.
 
-We look for files matching 'requirements', with any extension (so that we match .in and .txt files).
+We look for files matching 'requirements', with any extension (so that we match .in and .txt files as well as 'dev-requirements').
 We look into:
 - the project root
-- for Django projects for instance, into the project_root/app_name directory,
+- project_root/app_name directory (necessary for Django projects for instance),
 - any directory called 'requirements'."
   (let* ((root (projectile-project-root))
          (req-candidates (f-glob "*requirements*" root))
@@ -106,23 +106,17 @@ We look into:
         (error "We didn't find any requirements file.")
         candidates)))
 
-  ;; (concat (projectile-project-root) (projectile-project-name) "/requirements.txt")
-
-
 (defun pip-install-requirements ()
-  "Install packages from requirements.txt. Looks for a
-  'requirements.txt' file at the project root and in the
-  root/<project-name>/ (useful for django projects)."
+  "Install packages from requirements files. Look for different
+  requirements files in a few locations (see
+  `pip--get-requirements-file`)."
   (interactive)
-  (let ((pip--requirements-project (pip--get-requirements-file))
-        (pip--requirements-root (concat (projectile-project-root) "requirements.txt") ))
-    (if (file-exists-p pip--requirements-project)
-        (pip--install-requirements pip--requirements-project)
-      (message "no requirements file in root/project dir."))
-    (if (file-exists-p pip--requirements-root)
-        (pip--install-requirements pip--requirements-root)
-        (message "no requirements at root"))
-    ))
+  (let ((candidates (pip--get-requirements-file))
+        (reqfile nil))
+    (if (> (length candidates) 1)
+        (setq reqfile (ido-completing-read "Choose a requirements file: " candidates))
+      (setq reqfile candidates))
+    (pip--install-requirements reqfile)))
 
 (defun pip--get-all-packages ()
   "Get all packages of the current venv (with pip freeze). Keep their inline version. Return a list of package==x.y.z"
