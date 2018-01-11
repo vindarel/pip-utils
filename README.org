@@ -7,24 +7,28 @@ the file if many are found).
 One command to know: =M-x pip-utils-hydra/body=.
 
 Quick    access   to    change    the    current   virtualenv    (with
-=virtualenvwrapper.el=, on melpa).
+=virtualenvwrapper.el=, on melpa) (=w= as "workon" in the hydra).
 
 Commands:
 
-- =M-x pip-utils-install=: ask for a package, install it and optionally add it to a requirements file,
-- =M-x  pip-utils-install-add-to-requirements-=: install  the packages
-  from    a   requirements    file   (auto    discovered,   if    many
+- =M-x pip-install=: ask for a package, install it and optionally add it to a requirements file,
+- =M-x  pip-install-add-to-requirements-=:  ask  for a  package  name,
+  install it and add it to    a   requirements    file   (auto    discovered,   if    many
   =requirements.*= files found,  we ask. We look at  the project root,
   at  the   project  app   (suitable  for   Django  projects),   in  a
   "requirements/" directory.),
-- =M-x pip-utils-package-version=: get a package version,
-- =M-x pip-utils-homepage=:  open the package's  page on pypi,  from a
-  given package, orthe symbol at point, or one to choose from a pip freeze;
-- =M-x pip-utils-doc-popup=: get its doc on another buffer (wip),
+- =M-x pip-package-version=: get a package version, with completion of
+  packages read from pip freeze,
+- =M-x pip-homepage=:  open the package's  page on pypi,  from a
+  given package, or the symbol at point, or one to choose from a pip freeze;
+# - =M-x pip-utils-doc-popup=: get its doc on another buffer (wip),
 - =M-x venv-workon=: change the current virtual env (with virtualenvwrapper, on melpa)
 
 
 ** See also
 
+Found on MELPA:
+
 - pip-requirements for syntax highlighting of requirements files,
 - pcmpl-pip for shell completion
+- [[https://github.com/brotzeit/pippel/tree/3737d5934665b5059c1e858feeb4270262b37e53][pippel]], a package.el interface for pypi.

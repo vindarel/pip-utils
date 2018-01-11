@@ -12,7 +12,7 @@
 (defvar pip-requirements-glob "*requirements*.txt"
   "Glob pattern of the requirements file to look for at the project root, at root/<project-name>/ and inside a 'requirements' directory") ;; unused yet
 
-(defun pip-utils-package-version ()
+(defun pip-package-version ()
   "Get the package version number with a pip freeze. Local packages autocompletion. Display the package name and its version, return the version number. For a script use, see --get-package-version (package)"
   ;; with pip freeze, we have the package version inline.
   (let* ((packages (pip--get-all-packages))
@@ -185,7 +185,7 @@ Pip utils. venv: %`venv-current-name "
   ("I" (call-interactively 'pip-install-add-to-requirements) "Install and add in requirements.txt")
   ("r" (pip-install-requirements) "-r requirements")
   ("u" (pip-uninstall) "uninstall")
-  ("v" (pip-utils-package-version) "Get package version")
+  ("v" (pip-package-version) "Get package version")
   ("h" (pip-homepage) "Open the homepage in the browser")
   ("w" (venv-workon) "Workon venv…" :color red)
   )
