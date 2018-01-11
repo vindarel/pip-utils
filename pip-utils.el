@@ -77,15 +77,11 @@
                                     (unless (string-equal it "")
                                       (s-wrap it "\""))) pip-packages-list)))
 
-(defun pip--install-requirements (pip--requirements-project)
+(defun pip--install-requirements (reqfile)
   "Ask to install the packages in the given file and run it in a compilation process."
-  (if (yes-or-no-p (format "install packages from %s in venv %s ?" pip--requirements-project venv-current-name))
-      (progn
-        (message "go, install")
-        (setq pip-packages-list (pip-get-packages-list pip--requirements-project))
-        ;; install everything:
-        (compile (concat "pip install " (s-join " " pip-packages-list)))
-        )))
+  (if (yes-or-no-p (format "install packages from %s in venv %s ?" reqfile venv-current-name))
+      ;; ONGOING is this change ok for files in other directories than root ?
+      (compile (concat "pip install -r " reqfile))))
 
 (defun pip--get-requirements-file ()
   "Return a list of requirements files, or error out if no one is found.
